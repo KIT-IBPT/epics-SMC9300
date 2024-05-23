@@ -1,0 +1,602 @@
+/* Author:  Igor Kriznar <igor@scictrl.com> */
+
+# ### ## #
+# 
+# IDN
+# 
+
+record(stringin, "$(DEV):Info:IDN") {
+  field(DESC, "Identification string")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(INP,  "@SMC9300.proto getIDN $(PORT)")
+  field(PINI, "YES")
+  field(TPRO, "0")
+}
+
+# ### ## #
+# 
+# Info
+# 
+# problem reading out miltiline string
+#record(stringin, "$(DEV):Info:Str") {
+#  field(DESC, "Info string")
+#  field(DTYP, "stream")
+#  field(SCAN, "Passive")
+#  field(INP,  "@SMC9300.proto getInfo $(PORT)")
+#  field(PINI, "YES")
+#  field(TPRO, "0")
+#}
+
+# ### ## #
+# 
+# Axes count
+# 
+
+record(longin, "$(DEV):Info:Axis:Count") {
+  field(DESC, "Axes Count")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(INP,  "@SMC9300.proto getAxes $(PORT)")
+  field(PINI, "YES")
+  field(TPRO, "0")
+}
+
+# ### ## #
+# 
+# Axis
+# 
+
+record(longin, "$(DEV):Info:Axis") {
+  field(DESC, "Axis")
+  field(DTYP, "Soft Channel")
+  field(SCAN, "Passive")
+  field(VAL,  "$(AXIS)")
+  field(PINI, "YES")
+  field(TPRO, "0")
+}
+
+# ### ## #
+# 
+# Stop
+# 
+
+record(bo, "$(DEV):Cmd:Stop") {
+  field(DESC, "Stop")
+  field(DTYP, "stream")
+  field(OUT,  "@SMC9300.proto cmdStop($(AXIS)) $(PORT)")
+  field(TPRO, "0")
+}
+
+# ### ## #
+# 
+# Set position reference to 0
+# 
+
+record(bo, "$(DEV):Cmd:Zero") {
+  field(DESC, "Zero the current position")
+  field(DTYP, "stream")
+  field(OUT,  "@SMC9300.proto cmdZero($(AXIS)) $(PORT)")
+  field(TPRO, "0")
+}
+
+
+# ### ## #
+# 
+# Position readout
+# 
+
+record(ai, "$(DEV):Pos:Get") {
+  field(DESC, "Get motor position")
+  field(SCAN, "1 second")
+  field(DTYP, "stream")
+  field(INP,  "@SMC9300.proto getPos($(AXIS)) $(PORT)")
+  field(PREC, "4")
+  field(EGU,  "mm")
+  field(TPRO, "0")
+}
+
+# ### ## #
+# 
+# Position encoder readout
+# 
+
+record(ai, "$(DEV):Enc:Get") {
+  field(DESC, "Get motor encoder position")
+  field(SCAN, "1 second")
+  field(DTYP, "stream")
+  field(INP,  "@SMC9300.proto getPosEnc($(AXIS)) $(PORT)")
+  field(PREC, "5")
+  field(EGU,  "mm")
+  field(TPRO, "0")
+}
+
+
+# ### ## #
+#
+# Move Acceleration
+#
+
+record(longin, "$(DEV):Move:Acc:Get") {
+  field(DESC, "Get acceleration")
+  field(SCAN, "1 second")
+  field(DTYP, "stream")
+  field(INP,  "@SMC9300.proto getAcc($(AXIS)) $(PORT)")
+  field(EGU,  "Hz/ms")
+  field(HOPR, "8190")
+  field(LOPR, "10")
+  field(TPRO, "0")
+}
+
+record(longout, "$(DEV):Move:Acc:Set") {
+  field(DESC, "Set acceleration")
+  field(DTYP, "stream")
+  field(OUT,  "@SMC9300.proto setAcc($(AXIS)) $(PORT)")
+  field(EGU,  "Hz/ms")
+  field(HOPR, "8190")
+  field(LOPR, "10")
+  field(FLNK, "$(DEV):Move:Acc:Get PP NMS")
+  field(TPRO, "0")
+}
+
+# ### ## #
+#
+# Move Deceleration
+#
+
+record(longin, "$(DEV):Move:Dec:Get") {
+  field(DESC, "Get deceleration")
+  field(SCAN, "1 second")
+  field(DTYP, "stream")
+  field(INP,  "@SMC9300.proto getDec($(AXIS)) $(PORT)")
+  field(EGU,  "Hz/ms")
+  field(HOPR, "8190")
+  field(LOPR, "10")
+  field(TPRO, "0")
+}
+
+record(longout, "$(DEV):Move:Dec:Set") {
+  field(DESC, "Set deceleration")
+  field(DTYP, "stream")
+  field(OUT,  "@SMC9300.proto setDec($(AXIS)) $(PORT)")
+  field(EGU,  "Hz/ms")
+  field(HOPR, "8190")
+  field(LOPR, "10")
+  field(FLNK, "$(DEV):Move:Dec:Get PP NMS")
+  field(TPRO, "0")
+}
+
+
+# ### ## #
+#
+# Move Speed
+#
+
+record(longin, "$(DEV):Move:Velo:Get") {
+  field(DESC, "Get max velocity")
+  field(SCAN, "1 second")
+  field(DTYP, "stream")
+  field(INP,  "@SMC9300.proto getSpeed($(AXIS)) $(PORT)")
+  field(EGU,  "Hz")
+  field(HOPR, "3000")
+  field(LOPR, "10")
+  field(TPRO, "0")
+}
+
+record(longout, "$(DEV):Move:Velo:Set") {
+  field(DESC, "Set max velocity")
+  field(DTYP, "stream")
+  field(OUT,  "@SMC9300.proto setSpeed($(AXIS)) $(PORT)")
+  field(EGU,  "Hz")
+  field(HOPR, "3000")
+  field(LOPR, "10")
+  field(FLNK, "$(DEV):Move:Velo:Get PP NMS")
+  field(TPRO, "0")
+}
+
+# ### ## #
+#
+# Move Start Speed
+#
+
+record(longin, "$(DEV):Move:Start:Get") {
+  field(DESC, "Get start velocity")
+  field(SCAN, "1 second")
+  field(DTYP, "stream")
+  field(INP,  "@SMC9300.proto getStart($(AXIS)) $(PORT)")
+  field(EGU,  "Hz")
+  field(HOPR, "400")
+  field(LOPR, "10")
+  field(TPRO, "0")
+}
+
+record(longout, "$(DEV):Move:Start:Set") {
+  field(DESC, "Set start velocity")
+  field(DTYP, "stream")
+  field(OUT,  "@SMC9300.proto setStart($(AXIS)) $(PORT)")
+  field(EGU,  "Hz")
+  field(HOPR, "400")
+  field(LOPR, "10")
+  field(FLNK, "$(DEV):Move:Start:Get PP NMS")
+  field(TPRO, "0")
+}
+
+# ### ## #
+#
+# Move Absolute
+#
+
+record(ao, "$(DEV):Pos:Abs") {
+  field(DESC, "Absolute position for next movement")
+  field(DTYP, "Soft Channel")
+  field(EGU,  "mm")
+  field(VAL,  "0")
+  field(HOPR, "220")
+  field(LOPR, "0")
+  field(PREC, "4")
+  field(TPRO, "0")
+}
+
+record(dfanout, "$(DEV):Pos:Abs:Sync") {
+  field(DESC, "Use current position abs")
+  field(OMSL, "closed_loop")
+  field(DOL,  "$(DEV):Pos:Get.VAL NPP MSS")
+  field(SELM, "All")
+  field(OUTA, "$(DEV):Pos:Abs.VAL PP")
+}
+
+record(bo, "$(DEV):Cmd:Move:Abs") {
+  field(DESC, "Move to absolute position")
+  field(DTYP, "stream")
+  field(OUT,  "@SMC9300.proto cmdMoveAbs($(AXIS),$(DEV):Pos:Abs) $(PORT)")
+  field(VAL,  "0")
+  field(TPRO, "0")
+}
+
+# ### ## #
+#
+# Move Relative
+#
+
+record(ao, "$(DEV):Pos:Rel") {
+  field(DESC, "Relative position move for next movement")
+  field(DTYP, "Soft Channel")
+  field(EGU,  "mm")
+  field(VAL,  "0")
+  field(HOPR, "220")
+  field(LOPR, "-220")
+  field(PREC, "4")
+  field(TPRO, "0")
+}
+
+record(bo, "$(DEV):Cmd:Move:Rel") {
+  field(DESC, "Move for relative position")
+  field(DTYP, "stream")
+  field(OUT,  "@SMC9300.proto cmdMoveRel($(AXIS),$(DEV):Pos:Rel) $(PORT)")
+  field(VAL,  "0")
+  field(TPRO, "0")
+}
+
+# ### ## #
+#
+# Status update
+#
+
+record(mbbiDirect, "$(DEV):Status:Get") {
+  field(DESC, "Status")
+  field(DTYP, "stream")
+  field(SCAN, "1 second")
+  field(INP,  "@SMC9300.proto getStatus($(AXIS)) $(PORT)")
+  field(FLNK, "$(DEV):Status:_int PP NMS")
+  field(PINI, "YES")
+  field(TPRO, "0")
+}
+
+record(calc, "$(DEV):Status:_int") {
+  field(SCAN, "Passive")
+# bits          0-4      + 5-16 >> 1       
+  field(CALC, " (31 & A) + ((65504 & A) >> 1) ")
+  field(INPA, "$(DEV):Status:Get NPP MSS")
+  field(FLNK, "$(DEV):Status PP MSS")
+  field(TPRO, "0")
+}
+
+record(mbbiDirect, "$(DEV):Status") {
+  field(DESC, "Status")
+  field(DTYP, "Soft Channel")
+  field(SCAN, "Passive")
+  field(INP,  "$(DEV):Status:_int.VAL NPP MSS")
+  field(FLNK, "$(DEV):Status:_fanout PP NMS")
+  field(PINI, "YES")
+  field(TPRO, "0")
+}
+
+record(fanout, "$(DEV):Status:_fanout") {
+  field(LNK1, "$(DEV):Status:Bit0 PP NSS")
+  field(LNK2, "$(DEV):int_ErrorSum PP MSS")
+  field(LNK3, "$(DEV):Status:Homed PP MSS")
+}
+
+
+# ### ## #
+#
+# Error Sum
+#
+
+record(calc, "$(DEV):int_ErrorSum") {
+  field(SCAN, "Passive")
+# bits        111000010000000
+  field(CALC, "((28800 & A ) !=0 ) | B!=0")
+  field(INPA, "$(DEV):Status NPP MSS")
+  field(INPB, "$(DEV):Status.SEVR NPP MSS")
+  field(FLNK, "$(DEV):Status:ErrorSum PP MSS")
+  field(TPRO, "0")
+}
+
+record(bi, "$(DEV):Status:ErrorSum") {
+  field(DESC, "Device has errors")
+  field(DTYP, "Soft Channel")
+  field(SCAN, "Passive")
+  field(INP, "$(DEV):int_ErrorSum.VAL NPP MSS")
+  field(TPRO, "0")
+}
+
+# ### ## #
+#
+# Homed
+#
+
+record(calc, "$(DEV):Status:Homed") {
+  field(SCAN, "Passive")
+  field(DESC, "Motor has been homed")
+  field(CALC, "(16 & A ) == 16 ? 1 : 0")
+  field(INPA, "$(DEV):Status NPP MSS")
+  field(FLNK, "$(DEV):Status:Limit:Fwd PP MSS")
+  field(TPRO, "0")
+}
+
+# ### ## #
+#
+# Forward Limit
+#
+
+record(calc, "$(DEV):Status:Limit:Fwd") {
+  field(SCAN, "Passive")
+  field(DESC, "Forward HW limit is active")
+  field(CALC, "(8 & A ) == 8 ? 1 : 0")
+  field(INPA, "$(DEV):Status NPP MSS")
+  field(FLNK, "$(DEV):Status:Limit:Rev PP MSS")
+  field(TPRO, "0")
+}
+
+# ### ## #
+#
+# Reverse Limit
+#
+
+record(calc, "$(DEV):Status:Limit:Rev") {
+  field(SCAN, "Passive")
+  field(DESC, "Reverse HW limit is active")
+  field(CALC, "(4 & A ) == 4 ? 1 : 0")
+  field(INPA, "$(DEV):Status NPP MSS")
+  field(TPRO, "0")
+}
+
+# ### ## #
+#
+# Status strings and LEDs
+#
+
+record(mbbi, "$(DEV):Status:Strings") {
+  field(DESC, "Descriptions of status bits")
+  field(SCAN, "Passive")
+  field(DTYP, "Soft Channel")
+  field(NOBT, "16")
+  field(ZRVL, "0")
+  field(ONVL, "1")
+  field(TWVL, "2")
+  field(THVL, "3")
+  field(FRVL, "4")
+  field(FVVL, "5")
+  field(SXVL, "6")
+  field(SVVL, "7")
+  field(EIVL, "8")
+  field(NIVL, "9")
+  field(TEVL, "10")
+  field(ELVL, "11")
+  field(TVVL, "12")
+  field(TTVL, "13")
+  field(FTVL, "14")
+  field(FFVL, "15")
+  field(ZRST, "Ready")
+  field(ONST, "Ref Pos Enabled")
+  field(TWST, "Rev Limit")
+  field(THST, "Fwd Limit")
+  field(FRST, "Homed")
+  field(FVST, "Busy")
+  field(SXST, "Ctrl Ready")
+  field(SVST, "Oscillation")
+  field(EIST, "Oscillation Error")
+  field(NIST, "Ref Enabled")
+  field(TEST, "N/A")
+  field(ELST, "Rev Soft Limit")
+  field(TVST, "Fwd Soft Limit")
+  field(TTST, "Ctrl Blocked")
+  field(FTST, "Error")
+  field(FFST, "Ext Stop")
+}
+
+record(bi, "$(DEV):Status:Bit0") {
+  field(DTYP, "Soft Channel")
+  field(SCAN, "Passive")
+  field(INP,  "$(DEV):Status.B0 NPP MSS")
+  field(FLNK, "$(DEV):Status:Bit1 PP NMS")
+  field(DESC, "Ready")
+  field(ZSV,  "NO_ALARM")
+  field(OSV,  "NO_ALARM")
+  field(TPRO, "0")
+}
+
+record(bi, "$(DEV):Status:Bit1") {
+  field(DTYP, "Soft Channel")
+  field(SCAN, "Passive")
+  field(INP,  "$(DEV):Status.B1 NPP MSS")
+  field(FLNK, "$(DEV):Status:Bit2 PP NMS")
+  field(DESC, "Ref Pos Enabled")
+  field(ZSV,  "NO_ALARM")
+  field(OSV,  "NO_ALARM")
+  field(TPRO, "0")
+}
+
+record(bi, "$(DEV):Status:Bit2") {
+  field(DTYP, "Soft Channel")
+  field(SCAN, "Passive")
+  field(INP,  "$(DEV):Status.B2 NPP MSS")
+  field(FLNK, "$(DEV):Status:Bit3 PP NMS")
+  field(DESC, "Rev Limit")
+  field(ZSV,  "NO_ALARM")
+  field(OSV,  "MAJOR")
+  field(TPRO, "0")
+}
+
+record(bi, "$(DEV):Status:Bit3") {
+  field(DTYP, "Soft Channel")
+  field(SCAN, "Passive")
+  field(INP,  "$(DEV):Status.B3 NPP MSS")
+  field(FLNK, "$(DEV):Status:Bit4 PP NMS")
+  field(DESC, "Fwd Limit")
+  field(ZSV,  "NO_ALARM")
+  field(OSV,  "MAJOR")
+  field(TPRO, "0")
+}
+
+record(bi, "$(DEV):Status:Bit4") {
+  field(DTYP, "Soft Channel")
+  field(SCAN, "Passive")
+  field(INP,  "$(DEV):Status.B4 NPP MSS")
+  field(FLNK, "$(DEV):Status:Bit5 PP NMS")
+  field(DESC, "Homed")
+  field(ZSV,  "NO_ALARM")
+  field(OSV,  "NO_ALARM")
+  field(TPRO, "0")
+}
+
+record(bi, "$(DEV):Status:Bit5") {
+  field(DTYP, "Soft Channel")
+  field(SCAN, "Passive")
+  field(INP,  "$(DEV):Status.B5 NPP MSS")
+  field(FLNK, "$(DEV):Status:Bit6 PP NMS")
+  field(DESC, "Busy")
+  field(ZSV,  "NO_ALARM")
+  field(OSV,  "MINOR")
+  field(TPRO, "0")
+}
+
+record(bi, "$(DEV):Status:Bit6") {
+  field(DTYP, "Soft Channel")
+  field(SCAN, "Passive")
+  field(INP,  "$(DEV):Status.B6 NPP MSS")
+  field(FLNK, "$(DEV):Status:Bit7 PP NMS")
+  field(DESC, "Ctrl Ready")
+  field(ZSV,  "NO_ALARM")
+  field(OSV,  "NO_ALARM")
+  field(TPRO, "0")
+}
+
+record(bi, "$(DEV):Status:Bit7") {
+  field(DTYP, "Soft Channel")
+  field(SCAN, "Passive")
+  field(INP,  "$(DEV):Status.B7 NPP MSS")
+  field(FLNK, "$(DEV):Status:Bit8 PP NMS")
+  field(DESC, "Oscillation")
+  field(ZSV,  "NO_ALARM")
+  field(OSV,  "MINOR")
+  field(TPRO, "0")
+}
+
+record(bi, "$(DEV):Status:Bit8") {
+  field(DTYP, "Soft Channel")
+  field(SCAN, "Passive")
+  field(INP,  "$(DEV):Status.B8 NPP MSS")
+  field(FLNK, "$(DEV):Status:Bit9 PP NMS")
+  field(DESC, "Oscillation Error")
+  field(ZSV,  "NO_ALARM")
+  field(OSV,  "MAJOR")
+  field(TPRO, "0")
+}
+
+record(bi, "$(DEV):Status:Bit9") {
+  field(DTYP, "Soft Channel")
+  field(SCAN, "Passive")
+  field(INP,  "$(DEV):Status.B9 NPP MSS")
+  field(FLNK, "$(DEV):Status:Bit10 PP NMS")
+  field(DESC, "Ref Enabled")
+  field(ZSV,  "NO_ALARM")
+  field(OSV,  "NO_ALARM")
+  field(TPRO, "0")
+}
+
+record(bi, "$(DEV):Status:Bit10") {
+  field(DTYP, "Soft Channel")
+  field(SCAN, "Passive")
+  field(INP,  "$(DEV):Status.BA NPP MSS")
+  field(FLNK, "$(DEV):Status:Bit11 PP NMS")
+  field(DESC, "N/A")
+  field(ZSV,  "NO_ALARM")
+  field(OSV,  "NO_ALARM")
+  field(TPRO, "0")
+}
+
+record(bi, "$(DEV):Status:Bit11") {
+  field(DTYP, "Soft Channel")
+  field(SCAN, "Passive")
+  field(INP,  "$(DEV):Status.BB NPP MSS")
+  field(FLNK, "$(DEV):Status:Bit12 PP NMS")
+  field(DESC, "Rev Soft Limit")
+  field(ZSV,  "NO_ALARM")
+  field(OSV,  "MAJOR")
+  field(TPRO, "0")
+}
+
+record(bi, "$(DEV):Status:Bit12") {
+  field(DTYP, "Soft Channel")
+  field(SCAN, "Passive")
+  field(INP,  "$(DEV):Status.BC NPP MSS")
+  field(FLNK, "$(DEV):Status:Bit13 PP NMS")
+  field(DESC, "Fwd Soft Limit")
+  field(ZSV,  "NO_ALARM")
+  field(OSV,  "MAJOR")
+  field(TPRO, "0")
+}
+
+record(bi, "$(DEV):Status:Bit13") {
+  field(DTYP, "Soft Channel")
+  field(SCAN, "Passive")
+  field(INP,  "$(DEV):Status.BD NPP MSS")
+  field(FLNK, "$(DEV):Status:Bit14 PP NMS")
+  field(DESC, "Ctrl Blocked")
+  field(ZSV,  "NO_ALARM")
+  field(OSV,  "MAJOR")
+  field(TPRO, "0")
+}
+
+record(bi, "$(DEV):Status:Bit14") {
+  field(DTYP, "Soft Channel")
+  field(SCAN, "Passive")
+  field(INP,  "$(DEV):Status.BE NPP MSS")
+  field(FLNK, "$(DEV):Status:Bit15 PP NMS")
+  field(DESC, "Error")
+  field(ZSV,  "NO_ALARM")
+  field(OSV,  "MAJOR")
+  field(TPRO, "0")
+}
+
+record(bi, "$(DEV):Status:Bit15") {
+  field(DTYP, "Soft Channel")
+  field(SCAN, "Passive")
+  field(INP,  "$(DEV):Status.BF NPP MSS")
+  field(DESC, "Ext Stop")
+  field(ZSV,  "NO_ALARM")
+  field(OSV,  "MAJOR")
+  field(TPRO, "0")
+}

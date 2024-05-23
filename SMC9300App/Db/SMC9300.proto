@@ -1,0 +1,532 @@
+/* Author:  Igor Kriznar <igor@scictrl.com> */
+
+# system variables, control in and out behaviour
+
+#OutTerminator  = ;
+#InTerminator  = ;
+#LockTimeout  = 120;
+#ReplyTimeout  = 100;
+#ReadTimeout  = 100;
+#WriteTimeout  = 20;
+#MaxInput = 4;
+
+interminator  = "\r\n";
+outterminator = "\r\n";
+locktimeout   = 1000;
+replytimeout  = 1000;
+readtimeout   = 1000;
+#extrainput    = Ignore;
+
+
+# 
+# GET IDN
+#
+# category: query
+# allowed during positioning: yes
+# command
+# *idn? | ?v
+# description
+# query the current version number of the control application.
+# syntax
+# *idn?
+
+getIDN {
+    out "*idn?";
+    in "%16c";
+}
+
+# 
+# GET INFO
+# 
+# category: query
+# allowed during positioning: yes
+# description
+# returns basic system information and help syntax description.
+# syntax
+# ?
+# arguments
+# none
+# example
+# ?
+
+getInfo {
+    out "?";
+    in "%s";
+}
+
+#
+# GET AXIS COUNT
+#
+# category: query
+# allowed during positioning: yes
+# description
+# query number of available axes.
+# syntax
+# ?a
+# 
+
+getAxes {
+    out "?a";
+    in "%d";
+}
+
+
+#
+# GET STATUS
+#
+# category: query
+# allowed during positioning: yes
+# description
+# query of the current operating status. return value is formatted as follows:
+# <axis>:<status>; e.g.: 1:131;
+# syntax
+# ?s{axis}
+# arguments
+# {axis}  1 to number of installed axes
+#   without axis specifier: returns status information of all axes, separated by a semi-colon ';'
+# 
+# return value:
+#   bit0: 1 axis ready (i.e. axis stopped)
+#   bit1: 2 reference position installed
+#   bit2: 4 limit switch LIMIT- active
+#   bit3: 8 limit switch LIMIT+ active
+#   bit4: 16 axis initialized (i.e. homed at least once)
+#   bit5: 32 reserved
+#   bit6: 64 program execution in progress  
+#   bit7: 128 controller ready (i.e. idle, all axes stopped)
+#   bit8: 256 oscillation in progress
+#   bit9: 512 oscillation error
+#   bit10: 1024 encoder reference (index) installed
+#   bit11: 2048 reserved (cur. config)
+#   bit12: 4096 SOFT LIMIT-
+#   bit13: 8192 SOFT LIMIT+
+#   bit14: 16384 controller is blocked
+#   bit15: 32768 error message pending
+#   bit16: 65536 external stop active
+# 
+# example
+# ?s1
+# (return value e.g. 1:129;)
+# 
+# ?s
+# (return value e.g. 1:129;2:0;3:128;4:128;)
+#
+# Method parameters
+# \$1 - axis: 1,2,...
+#
+
+getStatus {
+    out "?s\$1";
+    in "\$1:%d;";
+}
+
+
+#
+# GET ENCODER POSITION
+#
+# category: query
+# allowed during positioning: yes
+# description
+# query of the current encoder position formatted as follows:
+# <axis>:<position>;<axis>:<position>;
+# e.g.: 1:1.234;
+# syntax
+# ?e{axis}
+# arguments
+# {axis}  1 to number of installed axes
+#   without axis specifier: return position values of all axes
+# example
+# ?e1
+# related commands
+# ?ec
+#
+# Method parameters
+# \$1 - axis: 1,2,...
+# 
+
+getPosEnc {
+    out "?e\$1";
+    in "\$1:%f;";
+}
+
+
+#
+# GET POSITION
+#
+# category: query
+# allowed during positioning: yes
+# description
+# query of the current position formatted as follows:
+# <axis>:<position>;<axis>:<position>;
+# e.g.: 1:1.234;
+# note: position query of an oscillating axis (see command 'osc')
+# is not supported. 'osc' will be returned instead of a position value.
+# syntax
+# ?p{axis}
+# arguments
+# {axis}  1 to number of installed axes
+#   without axis specifier: return position values of all axes
+# example
+# ?p
+# ?p1
+# related commands
+# pqrf
+#
+# Method parameters
+# \$1 - axis: 1,2,...
+# 
+
+getPos {
+    out "?p\$1";
+    in "\$1:%f;";
+}
+
+#
+# START-STOP SPEED
+#
+# category: configuration
+# allowed during positioning: no
+# command
+# frun | vrun
+# description
+# configuration of the start-stop speed used for the execution of manual positioning tasks, i. e. motions controlled through the direction keys [<neg] and [pos>] on the user interface or the positioning commands fast, move and goto.
+# syntax
+# frun[axis]:[speed]
+# arguments
+# [axis]  1 to number of installed axes
+# [speed] 1 to fmax [Hz], where fmax depends on motor type,
+#  driver type and positioning hardware properties.
+# example
+# frun1:200
+# related commands
+# ffast
+# run
+# move
+# goto
+#
+# Method parameters
+# \$1 - axis: 1,2,...
+#
+
+getStart {
+    out "?frun\$1";
+    in "frun\$1:%d";
+}
+
+setStart {
+    out "frun\$1:%d";
+    @init { getStart; }
+}
+
+#
+# ACCELERATION
+#
+# category: configuration
+# allowed during positioning: no
+# description
+# configuration of the acceleration ramp of an axis for subsequent move and goto positioning commands.
+# syntax
+# acc[axis]:[value]
+# arguments
+# [axis]  1 to number of installed axes
+# [value] 4|10 to 8190 Hz/ms
+# example
+# acc1:10
+# related commands
+# dec
+# macc  
+# mdec
+# 
+# Method parameters
+# \$1 - axis: 1,2,...
+#
+
+getAcc {
+    out "?acc\$1";
+    in "acc\$1:%d";
+}
+
+setAcc {
+    out "acc\$1:%d";
+    @init { getAcc; }
+}
+
+#
+# DECELERATION
+#
+# category: configuration
+# allowed during positioning: no
+# description
+# configuration of the deceleration ramp of an axis for subsequent move and goto positioning commands.
+# syntax
+# dec[axis]:[value]
+# arguments
+# [axis]  1 to number of installed axes
+# [value] 4|10 to 8190 Hz/ms
+# example
+# dec1:20
+# related commands
+# acc
+# macc  
+# 
+# Method parameters
+# \$1 - axis: 1,2,...
+# 
+
+getDec {
+    out "?dec\$1";
+    in "dec\$1:%d";
+}
+
+setDec {
+    out "dec\$1:%d";
+    @init { getDec; }
+}
+
+
+# 
+# SPEED
+#
+# category: configuration
+# allowed during positioning: no
+# command
+# ffast | vfast
+# description
+# configuration of the maximum slew speed of the motion speed profile.
+# this speed setting is used for the execution of manual positioning tasks, e.g. motions controlled through the direction keys [<neg] and [pos>] on the user interface or manual positioning commands fast, move and goto.
+# syntax
+# ffast[axis]:[speed]
+# arguments
+# [axis]  1 to number of installed axes
+# [speed] 1 to fmax [Hz], where fmax depends on motor type,
+#   driver type and positioning hardware properties.
+# example
+# ffast1:5000
+# related commands
+# fast
+# frun
+# move
+# goto
+# 
+# Method parameters
+# \$1 - axis: 1,2,...
+# 
+
+getSpeed {
+    out "?ffast\$1";
+    in "ffast\$1:%d";
+}
+
+setSpeed {
+    out "ffast\$1:%d";
+    @init { getSpeed; }
+}
+
+
+#
+# STRP / QUIT
+#
+# category: direct command
+# allowed during positioning: yes
+# command
+# q | quit | stop
+# description
+# this command causes the immediate termination of positioning processes.
+# transfer the command without axis specifier to stop all motions at the same time. the controller decelerates with the configured deceleration ramp 'dec'. in contrast to an emergency stop caused by limit switch events, the position information remains valid.
+# syntax
+# q{axis}
+# arguments
+# {axis}  1 to number of installed axes
+# example
+# q
+#
+# Method parameters
+# \$1 - axis: 1,2,...
+# 
+
+cmdStop {
+    out "q\$1";
+}
+
+#
+# HOME
+# 
+# category: direct command
+# allowed during positioning: no
+# command
+# home
+# description
+# execute a homing procedure with the stated axis.
+# hardware requirements
+# one or more of the following position indicators may be used to execute a homing procedure:
+# HOME switch
+# SD (NEAR HOME) switch
+# ECZ (encoder index) signal
+# LIMIT+|LIMIT- switch
+# syntax
+# home[axis]{:}{options}
+# arguments
+# [axis]  1 to number of installed axes
+# {options} home procedure definition string (not case sensitive),
+#     options separated by ';'.
+# 
+#   options:
+# 
+#   {jg}{-}{speed}  search limit switch position with given direction and speed
+#         after hitting the limit switch, controller reverses direction and runs until the switch is released
+# 
+#   {hs}{-|+}   home position = switch at HOME input, search direction reverse to jg
+#   {hsd}{-|+}  home position = switch at SD input, search direction reverse to jg
+#   {he}      home position = encoder ECZ signal
+# 
+#   {hm}{pos} find home position in forward direction and set position to pos
+#   {hr}{pos}   find home position in reverse direction and set position to pos
+#         default: no motion, pos = eref
+#         default speed is frun.
+#         ignored with {he},
+# 
+#   {vl}      set slow search speed for option hm/hr.
+# 
+# examples
+# home1         # no motion, just set status and position (rofs)
+# home1:hs-         # search HOME and stop, rev search direction
+# home1:hs+       # search HOME and stop, fwd search direction
+# home1:hsd-        # search SD and stop, rev search direction
+# home1:hsd+        # search SD and stop, fwd search direction
+# home1:he-         # search ECZ and stop, rev search direction
+# home1:he+       # search ECZ and stop, fwd search direction
+# home1:jg1000        # search LIMIT+
+# home1:hs;jg-500;hr90    # search LIMIT-, search HOME, run free in rev direction and set position to 90
+# home1:hs;jg1000;vl200;hm90  # search LIMIT+, search HOME, run free in fwd direction and set position to 90
+# 
+# home1:hsd;jg1000;hm   # search LIMIT+, search SD, run free in fwd direction and set position to 0
+# home1:hsd;jg-1200;hr15.5    # search LIMIT-, search SD, run free in rev direction and set position to 15.5
+# 
+# home1:he;jg1000     # smc: requires LIMIT+ and encoder ECZ signal
+#             # smc_pc.pci: requires SD+ signal and encoder ECZ signal
+# 
+# home1:he;jg-500     # smc: requires LIMIT- AND encoder ECZ signal
+#             # smc_pc.pci: requires SD- signal and encoder ECZ signal
+# 
+#             # NOTE: SD signals must be active
+#             # until occurence of HOME/ECZ
+# 
+# related commands
+# org
+# ref
+# eref
+# 
+# Method parameters
+# \$1 - axis: 1,2,...
+# 
+
+cmdHome {
+    out "home\$1";
+}
+
+#
+# MOVE RELATIVE
+# 
+# ategory: direct command
+# allowed during positioning: no
+# command
+# move
+# description
+# execute a relative motion.
+# the stated axis will move the given distance relative to the current position using either the configured default speed profile or the given speed profile. the controller starts at 'frun' and accelerates with 'acc' to 'ffast'. the controller calculates the slow-down position depending on the given distance, decelerates with 'dec' to 'frun' and stops finally at the target position.
+# 
+# syntax
+# move[axis]:[distance]{*[speed profile]}
+# 
+# arguments
+# [axis]    1 to number of installed axes
+# [position]    position value in [mm] or [deg],
+#     note: position value must not exceed +/- 2^23-1 steps/increments
+# [speed profile] s<frun>r<ffast>a<acc>d<dec>
+# 
+# example
+# #relative motion with default speed profile
+# move1:1.0
+# 
+# #relative motion with individual speed profile
+# move2:2.0*s500r2500
+# move2:5.0*s500r2500a10
+# move2:10.0*s500r2500a10d2
+# 
+# related commands
+# goto
+# 
+# Method parameters
+# \$1 - axis: 1,2,...
+# \$2 - relative distance to move
+# 
+
+cmdMoveRel {
+    out "move\$1:%(\$2)f";
+}
+
+#
+# MOVE ABSOLUTE
+# 
+# category: direct command
+# allowed during positioning: no
+# command
+# goto
+# description
+# execute absolute motion.
+# the stated axis will move to the given absolute position using either the configured default speed profile or the given speed profile. the controller starts at 'frun' and accelerates with 'acc' to 'ffast'. the controller calculates the slow-down position depending on the given distance, decelerates with 'dec' to 'frun' and stops finally at the target position.
+# syntax
+# goto[axis]:[position]{*[speed profile]}
+# arguments
+# [axis]    1 to number of installed axes
+# [position]    position value in [mm] or [deg],
+#       note: position value must not exceed +/- 2^23-1 steps/increments
+# [speed profile] s<frun>r<ffast>a<acc>d<dec>
+# example
+# #absolute motion with default speed profile
+# goto1:1.234
+# #absolute motion with individual speed profile
+# goto2:2.0*s500r2500
+# goto3:5.0*s500r2500a10
+# goto4:10.0*s500r2500a10d2
+# related commands
+# move
+#  
+# Method parameters
+# \$1 - axis: 1,2,...
+# \$2 - relative distance to move
+#
+cmdMoveAbs {
+    out "goto\$1:%(\$2)f";
+}
+
+#
+# ZERO
+# 
+# zero
+# description
+# set current position of stated axis to 0.00. if a reference position offset vale
+# is configured (see configuration command rofs ) the current position is set
+# to this value.
+# syntax
+# zero{axis}
+# arguments
+# {axis}
+# 1 … number of installed axes.
+# 0 or no argument: all axes at the same time.
+# usage
+# during positioning/program execution:
+# no
+# related commands
+# pos
+# examples
+# zero1
+# zero
+#  
+# Method parameters
+# \$1 - axis: 1,2,...
+#
+cmdZero {
+    out "zero\$1";
+}
+
