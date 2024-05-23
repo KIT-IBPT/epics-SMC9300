@@ -8,6 +8,6 @@ Device support uses StreamDevice support for communication with the motor contro
 Copyright / License
 -------------------
 
-This EPICS device support is licensed under the terms of the MIT license by 
+This EPICS device support is licensed under the terms of the [MIT license](LICENSE) by 
 [Karlsruhe Institute of Technology's Institute of Beam Physics and Technology](https://www.ibpt.kit.edu/) 
 and was developed by [igor@scictrl.com](http://scictrl.com).
