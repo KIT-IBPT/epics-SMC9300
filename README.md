@@ -5,6 +5,7 @@ This is EPICS device support IOC for SMC 9300 Huber motor controller by manufact
 
 Device support uses StreamDevice support for communication with the motor controller.
 
+
 ## IOC
 
 
@@ -72,6 +73,10 @@ Current device in operation has device PV prefix: F:TEST:SMC:01. Following is li
 | `Cmd:Move:Abs` | `bo` | Move to new absolute position, as provided by PV `Pos:Abs`. |
 | `Cmd:Move:Rel` | `bo` | Move by relative position as provided by PV `Pos:Rel`. |
 
+
+## CSS GUI Panels
+
+Panel module is located in CSS folder.
 
 
 ## Copyright / License
