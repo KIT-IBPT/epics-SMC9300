@@ -1,0 +1,14 @@
+/* Author:  Igor Kriznar <igor@scictrl.com> */
+
+# ### ## #
+#
+# Move Relative in sync two axis
+#
+
+record(bo, "$(DEV):Cmd:Move:Rel") {
+  field(DESC, "Move two axis for relative position ")
+  field(DTYP, "stream")
+  field(OUT,  "@SMC9300.proto cmdMoveRel2($(AXIS1),$(AXIS2),$(DEV1):Pos:Rel) $(PORT)")
+  field(VAL,  "0")
+  field(TPRO, "0")
+}

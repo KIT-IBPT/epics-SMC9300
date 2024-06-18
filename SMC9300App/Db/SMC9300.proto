@@ -530,3 +530,67 @@ cmdZero {
     out "zero\$1";
 }
 
+
+#
+# MOVE RELATIVE IN SYNC TWO AXIS
+# 
+# tbc
+# description
+#   clear target buffer, i.e. set all target position values to 'r0.00'.
+# syntax
+#   tbc
+# arguments
+#   none
+# usage
+#  during positioning/program execution: no
+# 
+# tbg
+# description
+#   execute positioning task depending on the target buffer content.
+#   all axes which have a target position set will start simultaneously using the
+#   configured speed profile.
+#   NOTE: moving axes will stop immediately upon the occurrence of a limit
+#   switch event. if a limit switch input is already active, no motion is executed.
+#   use option 'iel' if limit switch status shall be ignored.
+#   NOTE: axes with active limit switches will not move into direction of the
+#   active limit switch even if you use option 'iel'.
+# syntax
+#   tbg{:iel}
+# arguments
+#   {:iel}    ignore end/limit status.
+# usage
+#   during positioning/program execution: no
+#
+# tbs
+# description
+#   set target buffer content.
+# syntax
+#   tbs[axis]:{a|r}[distance]
+# arguments
+#   [axis]      1 ... number of installed axes. 
+#   {a|r}       specify absolute or relative positioning.
+#   [distance]  distance value in [mm] or [deg].
+# usage
+#   during positioning/program execution: no
+#
+# example
+# set target buffer in order to move axis 1 and 2 simultaneously by 1.5.
+# start motion, ignore end/limit status.
+# tbc
+# tbs1:r1.5
+# tbs2:r1.5
+# tbg:iel
+# 
+# Method parameters
+# \$1 - first axis: 1,2,...
+# \$2 - second axis: 1,2,...
+# \$3 - relative distance to move
+# 
+
+cmdMoveRel2 {
+    out "tbc";
+    out "tbs\$1:r%(\$3)f";
+    out "tbs\$2:r%(\$3)f";
+    out "tbg";
+}
+

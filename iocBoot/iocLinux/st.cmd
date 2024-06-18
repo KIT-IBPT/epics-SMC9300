@@ -40,8 +40,14 @@ asynSetTraceIOMask("SMC1",-1,0x00)
 # DEV  - device PV prefix
 # AXIS - axis number, from 1 to number of installed axes
 
+# AXIS 1
 dbLoadRecords("../../db/SMC9300.db", "PORT=SMC1,DEV=F:TEST:SMC:01,AXIS=1")
+
+# AXIS 2
 dbLoadRecords("../../db/SMC9300.db", "PORT=SMC1,DEV=F:TEST:SMC:02,AXIS=2")
+
+# AXIS SYNC MOVE 1&2
+dbLoadRecords("../../db/SMC9300sync.db", "DEV=F:TEST:SMC2:01,DEV1=F:TEST:SMC:01,AXIS1=1,AXIS2=2")
 
 #dbLoadTemplate "../../db/ThorlabsBBD203.substitutions"
 
