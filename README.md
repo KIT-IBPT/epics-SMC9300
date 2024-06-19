@@ -83,4 +83,4 @@ Panel module is located in CSS folder.
 
 This EPICS device support is licensed under the terms of the [MIT license](LICENSE) by 
 [Karlsruhe Institute of Technology's Institute of Beam Physics and Technology](https://www.ibpt.kit.edu/) 
-and was developed by [igor@scictrl.com](http://scictrl.com).
+and was developed by [igor@scictrl.com](http://scictrl.org).
